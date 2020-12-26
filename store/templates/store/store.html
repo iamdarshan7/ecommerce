@@ -1,20 +1,55 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% block title %}
+<title>Ecom | Store</title>
+{% endblock title %}
 {% block content %}
-	<div class="row">
-		{% for product in products %}
-		<div class="col-lg-4">
-			<img class="thumbnail" src="{{product.imageURL}}">
-			<div class="box-element product">
-				<h6><strong>{{product.name}}</strong></h6>
-				<hr>
+<div class="row">
+	{% for product in page_obj %}
+	<div class="col-lg-4 mobile-div">
+		<img class="thumbnail" src="{{product.imageURL}}">
+		<div class="box-element product mobile-box">
+			<h6 class="d-flex flex-row justify-content-center mobile-product-name"><strong>{{product.name}}</strong></h6>
+			<hr>
+            <div class='d-flex flex-row justify-content-center mobile-box'>
 
-				<button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-				<a class="btn btn-outline-success" href="#">View</a>
-				<h4 style="display: inline-block;float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+				<button data-product={{product.id}} data-action="add"
+					class="btn btn-outline-danger add-btn update-cart mr-2 mobile-box-cart">Add to Cart</button>
+				<a class="btn btn-outline-success mobile-box" href="#">View</a>
+			</div>
+
+			<div class="d-flex flex-row justify-content-center mt-2">
+				<h4 class="mr-3 strikeout mobile-discount"><strong>${{product.discount|floatformat:2}}</strong></h4>
+				<h4 class="mobile-discount"><strong>${{product.price|floatformat:2}}</strong></h4>
 
 			</div>
+
+
+
 		</div>
-        {% endfor %}
 	</div>
-{% endblock content %}
+	{% endfor %}
+
+</div>
+
+
+<div class="d-flex justify-content-center mt-4">
+	{% if page_obj.has_previous %}
+	<a class='btn btn-outline-danger mb-4' href="?page=1">First</a>
+	<a class='btn btn-outline-danger mb-4' href="?page={{ page_obj.previous_page_number }}">Previous</a>
+	{% endif %}
+
+	{% for num in page_obj.paginator.page_range %}
+	{% if page_obj.number == num %}
+	<a class='btn btn-danger mb-4' href="?page={{ num }}">{{ num }}</a>
+	{% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a class='btn btn-outline-danger mb-4'
+		href="?page={{ num }}">{{ num }}</a>
+		{% endif %}
+		{% endfor %}
+
+		{% if page_obj.has_next %}
+		<a class='btn btn-outline-danger mb-4' href="?page={{ page_obj.next_page_number}}">Next</a>
+		<a class='btn btn-outline-danger mb-4' href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+		{% endif %}
+
+		{% endblock content %}

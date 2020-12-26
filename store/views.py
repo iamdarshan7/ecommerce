@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.core.paginator import Paginator    #new
 import json
 import datetime
 
+from .forms import BudgetForm
 from .models import *
 from .utils import cookieCart, cartData, guestOrder
 
@@ -14,7 +16,10 @@ def store(request):
     cartItems = data['cartItems']
         
     products = Product.objects.all()
-    context = {'products': products, "cartItems": cartItems}
+    paginator = Paginator(products, 6)          #new
+    page_number = request.GET.get('page')       #new
+    page_obj = paginator.get_page(page_number)  #new
+    context = {'products': products, "cartItems": cartItems, 'page_obj': page_obj}
     return render(request, 'store/store.html', context)
 
 
@@ -98,3 +103,14 @@ def processOrder(request):
         )
         
     return JsonResponse('Payment complete', safe=False)
+
+
+def budgetCalculator(request):
+    if request.method == "POST":
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            form = BudgetForm()
+    else:
+        form = BudgetForm()
+    return render(request, 'store/main.html', {'form': form})            
